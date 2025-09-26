@@ -1,4 +1,3 @@
-
 import { authOptions } from "@/constants/authOptions";
 import NextAuth from "next-auth";
 
