@@ -8,6 +8,9 @@ const nextConfig: NextConfig = {
 		dirs: ['src'],
 		ignoreDuringBuilds: true,
 	},
+	images: {
+		domains: ['lh3.googleusercontent.com']
+	}
 };
 
 export default nextConfig;

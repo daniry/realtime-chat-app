@@ -1,19 +1,12 @@
-import Button from '@/components/ui/Button/Button';
-import { authOptions } from '@/constants/auth-options';
-import { getServerSession } from 'next-auth';
+import { getUserSession } from '@/helpers/get-user-session';
+import { notFound } from 'next/navigation';
 import React from 'react';
 
 const Page = async ({}) => {
-	const session = await getServerSession(authOptions);
+	const user = await getUserSession();
+	if (!user) notFound();
 
-	return (
-		<main className="p-8">
-			<input
-				type="email"
-				className="form-input mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-			/>
-		</main>
-	);
+	return <main className="container py-12">main page</main>;
 };
 
 export default Page;

@@ -2,8 +2,12 @@ import { Icons } from '@/components/Icons';
 import { sidebarOptions } from '@/constants/sidebar-options';
 import { getUserSession } from '@/helpers/get-user-session';
 import Link from 'next/link';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { ReactNode } from 'react';
+import { SignOutButton } from '@/components/SignOutButton';
+import { FriendRequestSidebarOptions } from '@/components/FriendRequestSidebarOptions';
+import { fetchRedis } from '@/helpers/redis';
 
 interface LayoutProps {
 	children: ReactNode;
@@ -11,8 +15,14 @@ interface LayoutProps {
 
 const Layout = async ({ children }: LayoutProps) => {
 	const user = await getUserSession();
-
 	if (!user) notFound();
+
+	const unseenRequestCount = (
+		(await fetchRedis(
+			'smembers',
+			`user:${user.id}:incoming_friend_requests`
+		)) as User[]
+	).length;
 
 	return (
 		<div className="w-full flex h-screen">
@@ -61,7 +71,40 @@ const Layout = async ({ children }: LayoutProps) => {
 										</li>
 									);
 								})}
+
+								<li>
+									<FriendRequestSidebarOptions
+										initialUnseenCount={unseenRequestCount}
+										sessionId={user.id}
+									/>
+								</li>
 							</ul>
+						</li>
+
+						<li className="-mx-6 mt-auto flex items-center">
+							<div className="flex flex-1 items-center gap-x-4 px-6 py-4 text-sm font-semibold leading-6 text-gray-900">
+								<div className="relative h-10 w-10 bg-gray-50">
+									<Image
+										fill
+										referrerPolicy="no-referrer"
+										className="rounded-full"
+										src={user.image || ''}
+										alt="Изображение профиля"
+									/>
+								</div>
+
+								<span className="sr-only">Твой профиль</span>
+								<div className="flex flex-col">
+									<span aria-hidden="true">{user.name}</span>
+									<span
+										className="text-xs text-zinc-400"
+										aria-hidden={true}
+									>
+										{user.email}
+									</span>
+								</div>
+							</div>
+							<SignOutButton className="h-full aspect-square" />
 						</li>
 					</ul>
 				</nav>
